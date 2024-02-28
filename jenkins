@@ -160,12 +160,11 @@ pipeline {
     post {
         always {
             script {
-                // Capturing end time
+                // Using current system time for end time
                 def endTime = new Date().time
-                // Calculating duration in milliseconds
-                def duration = endTime - Long.parseLong(env.START_TIME)
-                // Converting duration from milliseconds to a more readable format
-                // Since direct format method might not be available, calculating manually
+                // Assuming START_TIME was set as a string representing the time in milliseconds
+                // Avoiding direct Long parsing due to Jenkins security restrictions
+                def duration = endTime - (env.START_TIME as Long)
                 int seconds = (int) (duration / 1000) % 60
                 int minutes = (int) ((duration / (1000*60)) % 60)
                 int hours = (int) ((duration / (1000*60*60)) % 24)
