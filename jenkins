@@ -16,8 +16,8 @@ pipeline {
                         parallelStages["Content-${platform}"] = {
                             stage("Build Content - ${platform}") {
                                 steps {
-                                    dir('resources\\') {
-                                        sh "build.sh ${platform} build"
+                                    dir('resources') {
+                                        bat "build.bat ${platform} build"
                                     }
                                 }
                             }
@@ -29,8 +29,8 @@ pipeline {
                             parallelStages["Code-${platformName}-${configName}"] = {
                                 stage("Build Code - ${platformName} - ${configName}") {
                                     steps {
-                                        dir('source\\') {
-                                            sh "build.sh ${platformName} ${configName} build"
+                                        dir('source') {
+                                            bat "build.bat ${platformName} ${configName} build"
                                         }
                                     }
                                 }
@@ -56,12 +56,12 @@ pipeline {
                                 stage("Package and Test - ${platformName} - ${configName}") {
                                     steps {
                                         // Package
-                                        dir('scripts\\') {
-                                            sh "build.sh ${platformName} ${configName} package"
+                                        dir('scripts') {
+                                            bat "build.bat ${platformName} ${configName} package"
                                         }
                                         // Test
-                                        dir('scripts\\') {
-                                            sh "build.sh ${platformName} ${configName} test"
+                                        dir('scripts') {
+                                            bat "build.bat ${platformName} ${configName} test"
                                         }
                                     }
                                 }
