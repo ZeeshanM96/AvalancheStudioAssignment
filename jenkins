@@ -1,0 +1,82 @@
+pipeline {
+    agent any
+    parameters {
+        choice(name: 'PLATFORMS', choices: ['Steam', 'Epic', 'XboxOne'], description: 'Select platforms')
+        choice(name: 'CONFIGURATIONS', choices: ['debug', 'final'], description: 'Select configurations')
+    }
+    stages {
+        stage('Prepare') {
+            steps {
+                script {
+                    def platforms = params.PLATFORMS.tokenize(',')
+                    def configurations = params.CONFIGURATIONS.tokenize(',')
+                    def parallelStages = [:]
+                    for (platform in platforms) {
+                        // Build content once per platform, configuration agnostic
+                        parallelStages["Content-${platform}"] = {
+                            stage("Build Content - ${platform}") {
+                                steps {
+                                    dir('resources\\') {
+                                        sh "build.sh ${platform} build"
+                                    }
+                                }
+                            }
+                        }
+                        // Build code for each platform and configuration
+                        for (config in configurations) {
+                            def platformName = platform.trim()
+                            def configName = config.trim()
+                            parallelStages["Code-${platformName}-${configName}"] = {
+                                stage("Build Code - ${platformName} - ${configName}") {
+                                    steps {
+                                        dir('source\\') {
+                                            sh "build.sh ${platformName} ${configName} build"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    // Execute code and content build stages in parallel
+                    parallel parallelStages
+                }
+            }
+        }
+        stage('Package and Test') {
+            steps {
+                script {
+                    def platforms = params.PLATFORMS.tokenize(',')
+                    def configurations = params.CONFIGURATIONS.tokenize(',')
+                    def parallelStages = [:]
+                    for (platform in platforms) {
+                        for (config in configurations) {
+                            def platformName = platform.trim()
+                            def configName = config.trim()
+                            parallelStages["Package-and-Test-${platformName}-${configName}"] = {
+                                stage("Package and Test - ${platformName} - ${configName}") {
+                                    steps {
+                                        // Package
+                                        dir('scripts\\') {
+                                            sh "build.sh ${platformName} ${configName} package"
+                                        }
+                                        // Test
+                                        dir('scripts\\') {
+                                            sh "build.sh ${platformName} ${configName} test"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    // Execute packaging and testing in parallel
+                    parallel parallelStages
+                }
+            }
+        }
+    }
+    post {
+        always {
+            echo 'Pipeline execution completed.'
+        }
+    }
+}
