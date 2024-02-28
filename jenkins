@@ -13,7 +13,6 @@ pipeline {
         }
         stage('Prepare') {
             steps {
-                script {
                     def platforms = params.PLATFORMS.tokenize(',')
                     def configurations = params.CONFIGURATIONS.tokenize(',')
                     def parallelStages = [:]
@@ -61,11 +60,9 @@ pipeline {
                     // Execute code and content build stages in parallel
                     parallel parallelStages
                 }
-            }
         }
         stage('Package and Test') {
             steps {
-                script {
                     def platforms = params.PLATFORMS.tokenize(',')
                     def configurations = params.CONFIGURATIONS.tokenize(',')
                     def parallelStages = [:]
@@ -105,7 +102,6 @@ pipeline {
                     }
                     // Execute packaging and testing in parallel
                     parallel parallelStages
-                }
             }
         }
     }
