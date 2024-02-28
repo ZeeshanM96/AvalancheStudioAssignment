@@ -47,12 +47,16 @@ pipeline {
                                 stage("Build Code - ${platformName} - ${configName}") {
                                         dir('source') {
                                             try {
-                                                bat "build.sh ${platformName} ${configName} build"
-                                            } catch (Exception e) {
-                                                currentBuild.result = 'FAILURE'
-                                                echo "Build Code failed for platform ${platformName}, configuration ${configName}: ${e.message}"
-                                                echo "${e.printStackTrace()}"
-                                                error "Build Code failed for platform ${platformName}, configuration ${configName}"
+                                                bat "build.bat ${platformName} ${configName} build"
+                                            } catch (Exception batException) {
+                                                echo "build.bat failed or not found, now trying build.sh for platform ${platformName}, configuration ${configName}: ${batException.message}"
+                                                try {
+                                                    bat "sh build.sh ${platformName} ${configName} build"
+                                                } catch (Exception shException) {
+                                                    currentBuild.result = 'FAILURE'
+                                                    echo "Build Code failed for platform ${platformName}, configuration ${configName} after trying both build.bat and build.sh: ${shException.message}"
+                                                    error "Build Code failed for platform ${platformName}, configuration ${configName}"
+                                                }
                                             }
                                         }
                                 }
