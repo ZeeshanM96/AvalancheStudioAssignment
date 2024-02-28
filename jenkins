@@ -3,9 +3,6 @@ pipeline {
     options {
         timestamps()
     }
-    environment {
-        START_TIME = new Date().time
-    }
     parameters {
         extendedChoice(
             name: 'PLATFORMS',
@@ -31,6 +28,14 @@ pipeline {
         )
     }
     stages {
+        stage('Initialize') {
+            steps {
+                script {
+                    // Set the START_TIME environment variable to the current timestamp
+                    env.START_TIME = "${new Date().time}"
+                }
+            }
+        }
         stage('Checkout') {
             steps {
                 // Git checkout step
@@ -158,9 +163,13 @@ pipeline {
                 // Capturing end time
                 def endTime = new Date().time
                 // Calculating duration in milliseconds
-                def duration = endTime - env.START_TIME
+                def duration = endTime - Long.parseLong(env.START_TIME)
                 // Converting duration from milliseconds to a more readable format
-                def readableDuration = DurationFormatUtils.formatDuration(duration, 'HH:mm:ss,SSS', true)
+                // Since direct format method might not be available, calculating manually
+                int seconds = (int) (duration / 1000) % 60
+                int minutes = (int) ((duration / (1000*60)) % 60)
+                int hours = (int) ((duration / (1000*60*60)) % 24)
+                String readableDuration = String.format("%02d:%02d:%02d", hours, minutes, seconds)
                 // Logging the total time taken for the pipeline
                 echo "Total time taken for the pipeline: ${readableDuration}"
             }
