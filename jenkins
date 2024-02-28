@@ -29,6 +29,7 @@ pipeline {
                                             try {
                                                 // If build.bat fails, try to run build.sh
                                                 bat label: 'Running build.sh', script: "build.sh ${platform} build"
+                                            }
                                         } catch (Exception shException) {
                                             currentBuild.result = 'FAILURE'
                                             echo "Build Content failed for platform ${platform}: ${shException.getMessage()}"
