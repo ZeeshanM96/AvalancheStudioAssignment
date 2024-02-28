@@ -21,7 +21,7 @@ pipeline {
                         // Build content once per platform, configuration agnostic
                         parallelStages["Content-${platform}"] = {
                             stage("Build Content - ${platform}") {
-                                steps {
+                                steps { // Remove this line
                                     dir('resources') {
                                         try {
                                             bat "build.sh ${platform} build"
@@ -32,7 +32,7 @@ pipeline {
                                             error "Build Content failed for platform ${platform}"
                                         }
                                     }
-                                }
+                                } // Remove this line
                             }
                         }
                         // Build code for each platform and configuration
@@ -41,7 +41,7 @@ pipeline {
                             def configName = config.trim() // Declare inside the loop
                             parallelStages["Code-${platformName}-${configName}"] = {
                                 stage("Build Code - ${platformName} - ${configName}") {
-                                    steps {
+                                    steps { // Remove this line
                                         dir('source') {
                                             try {
                                                 bat "build.sh ${platformName} ${configName} build"
@@ -52,7 +52,7 @@ pipeline {
                                                 error "Build Code failed for platform ${platformName}, configuration ${configName}"
                                             }
                                         }
-                                    }
+                                    } // Remove this line
                                 }
                             }
                         }
@@ -75,7 +75,7 @@ pipeline {
                             def configName = config.trim()
                             parallelStages["Package-and-Test-${platformName}-${configName}"] = {
                                 stage("Package and Test - ${platformName} - ${configName}") {
-                                    steps {
+                                    steps { // Remove this line
                                         // Package
                                         dir('scripts') {
                                             try {
@@ -98,7 +98,7 @@ pipeline {
                                                 error "Test failed for platform ${platformName}, configuration ${configName}"
                                             }
                                         }
-                                    }
+                                    } // Remove this line
                                 }
                             }
                         }
