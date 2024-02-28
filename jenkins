@@ -9,7 +9,7 @@ pipeline {
             multiSelectDelimiter: ',',
             quoteValue: false,
             visibleItemCount: 3,
-            choiceType: 'PT_MULTI_SELECT',
+            // choiceType: 'PT_MULTI_SELECT',
             description: 'Select platforms',
             value: 'Steam,Epic,XboxOne',
             defaultValue: 'Steam,Epic,XboxOne'
@@ -20,7 +20,7 @@ pipeline {
             multiSelectDelimiter: ',',
             quoteValue: false,
             visibleItemCount: 2,
-            choiceType: 'PT_MULTI_SELECT',
+            // choiceType: 'PT_MULTI_SELECT',
             description: 'Select configurations',
             value: 'debug,final',
             defaultValue: 'debug,final'
