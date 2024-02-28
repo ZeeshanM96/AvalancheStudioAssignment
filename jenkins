@@ -24,8 +24,8 @@ pipeline {
                         }
                         // Build code for each platform and configuration
                         for (config in configurations) {
-                            def platformName = platform.trim()
-                            def configName = config.trim()
+                            def platformName = platform.trim() // Declare inside the loop
+                            def configName = config.trim() // Declare inside the loop
                             parallelStages["Code-${platformName}-${configName}"] = {
                                 stage("Build Code - ${platformName} - ${configName}") {
                                     steps {
@@ -37,6 +37,7 @@ pipeline {
                             }
                         }
                     }
+
                     // Execute code and content build stages in parallel
                     parallel parallelStages
                 }
