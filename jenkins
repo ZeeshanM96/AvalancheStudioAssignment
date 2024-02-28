@@ -160,18 +160,17 @@ pipeline {
     post {
         always {
             script {
-                // Capturing end time
-                def endTime = new Date().time
-                // Calculating duration in milliseconds
-                def duration = endTime - env.START_TIME as Long
-                // Converting duration from milliseconds to a more readable format
-                // Since direct format method might not be available, calculating manually
-                int seconds = (int) (duration / 1000) % 60
-                int minutes = (int) ((duration / (1000*60)) % 60)
-                int hours = (int) ((duration / (1000*60*60)) % 24)
-                String readableDuration = String.format("%02d:%02d:%02d", hours, minutes, seconds)
-                // Logging the total time taken for the pipeline
-                echo "Total time taken for the pipeline: ${readableDuration}"
+                // Capturing end time as Long for consistency
+            long endTime = new Date().time
+            // Convert START_TIME from String to Long before subtraction
+            long startTime = env.START_TIME.toLong()
+            long duration = endTime - startTime
+            int seconds = (int) (duration / 1000) % 60
+            int minutes = (int) ((duration / (1000 * 60)) % 60)
+            int hours = (int) ((duration / (1000 * 60 * 60)) % 24)
+            String readableDuration = String.format("%02d:%02d:%02d", hours, minutes, seconds)
+            // Logging the total time taken for the pipeline
+            echo "Total time taken for the pipeline: ${readableDuration}"
             }
             echo 'Pipeline execution completed.'
         }
