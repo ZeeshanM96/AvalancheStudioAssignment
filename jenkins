@@ -31,14 +31,12 @@ pipeline {
         stage('Initialize') {
             steps {
                 script {
-                    // Set the START_TIME environment variable to the current timestamp
                     env.START_TIME = "${new Date().time}"
                 }
             }
         }
         stage('Checkout') {
             steps {
-                // Git checkout step
                 git branch: 'main', credentialsId: 'ZeeshanM96Token', url: 'https://github.com/ZeeshanM96/AvalancheStudioAssignment.git'
             }
         }
@@ -160,20 +158,15 @@ pipeline {
     post {
         always {
             script {
-            // Capture the end time
             long endTime = new Date().time
-            // Ensure START_TIME is treated as a long integer
             long startTime = env.START_TIME.toLong()
-            // Calculate the duration
             long duration = endTime - startTime
-            // Convert milliseconds to seconds before applying modulus for minutes and seconds
             int totalSeconds = (int) (duration / 1000)
             int seconds = totalSeconds % 60
             int totalMinutes = totalSeconds / 60  
             int minutes = totalMinutes % 60
             int hours = totalMinutes / 60  
             String readableDuration = String.format("%02d:%02d:%02d", hours, minutes, seconds)
-            // Log the total time taken for the pipeline
             echo "Total time taken for the pipeline: ${readableDuration}"
             }
             echo 'Pipeline execution completed.'
@@ -181,7 +174,6 @@ pipeline {
         failure {
             echo "Build failed on ${env.STAGE_NAME} stage"
             echo "Failure cause: ${currentBuild.result}"
-            // Add any additional logging or actions for failure
         }
     }
 }
