@@ -23,12 +23,18 @@ pipeline {
                             stage("Build Content - ${platform}") {
                                     dir('resources') {
                                         try {
-                                            bat "build.sh ${platform} build"
+                                            bat "build.bat ${platform} build"
                                         } catch (Exception e) {
-                                            currentBuild.result = 'FAILURE'
-                                            echo "Build Content failed for platform ${platform}: ${e.message}"
-                                            echo "${e.printStackTrace()}"
-                                            error "Build Content failed for platform ${platform}"
+                                            echo "build.bat failed or not found for platform ${platform}, now trying build.sh."
+                                            try {
+                                                bat "build.sh ${platform} build"
+                                            } catch (Exception e2) {
+                                                currentBuild.result = 'FAILURE'
+                                                echo "Build Content failed for platform ${platform}: Both build.bat and build.sh could not be executed."
+                                                echo "Error from build.bat: ${e.message}"
+                                                echo "Error from build.sh: ${e2.message}"
+                                                error "Build Content failed for platform ${platform}"
+                                            }
                                         }
                                     }
                             }
