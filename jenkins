@@ -31,7 +31,6 @@ pipeline {
                                             error "Build Content failed for platform ${platform}"
                                         }
                                     }
-                                // } // Remove this line
                             }
                         }
                         // Build code for each platform and configuration
@@ -40,7 +39,6 @@ pipeline {
                             def configName = config.trim() // Declare inside the loop
                             parallelStages["Code-${platformName}-${configName}"] = {
                                 stage("Build Code - ${platformName} - ${configName}") {
-                                    // steps { // Remove this line
                                         dir('source') {
                                             try {
                                                 bat "build.sh ${platformName} ${configName} build"
@@ -51,7 +49,6 @@ pipeline {
                                                 error "Build Code failed for platform ${platformName}, configuration ${configName}"
                                             }
                                         }
-                                    // } // Remove this line
                                 }
                             }
                         }
