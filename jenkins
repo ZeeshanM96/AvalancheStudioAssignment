@@ -51,7 +51,7 @@ pipeline {
                                                 error "Build Code failed for platform ${platformName}, configuration ${configName}"
                                             }
                                         }
-                                    } // Remove this line
+                                    // } // Remove this line
                                 }
                             }
                         }
