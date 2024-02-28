@@ -41,21 +41,23 @@ pipeline {
                         }
                         // Build code for each platform and configuration
                         for (config in configurations) {
-                            def platformName = platform.trim() // Declare inside the loop
-                            def configName = config.trim() // Declare inside the loop
+                            def platformName = platform.trim()
+                            def configName = config.trim()
                             parallelStages["Code-${platformName}-${configName}"] = {
                                 stage("Build Code - ${platformName} - ${configName}") {
                                         dir('source') {
                                             try {
                                                 bat "build.bat ${platformName} ${configName} build"
-                                            } catch (Exception batException) {
-                                                echo "build.bat failed or not found, now trying build.sh for platform ${platformName}, configuration ${configName}: ${batException.message}"
+                                            } catch (Exception e) {
+                                                echo "build.bat failed or not found for platform ${platform}, now trying build.sh."
                                                 try {
                                                     bat "sh build.sh ${platformName} ${configName} build"
-                                                } catch (Exception shException) {
+                                                } catch (Exception e2) {
                                                     currentBuild.result = 'FAILURE'
-                                                    echo "Build Code failed for platform ${platformName}, configuration ${configName} after trying both build.bat and build.sh: ${shException.message}"
+                                                    echo "Build Code failed for platform ${platformName}, configuration ${configName}: Both build.bat and build.sh could not be executed."
                                                     error "Build Code failed for platform ${platformName}, configuration ${configName}"
+                                                    echo "Error from build.bat: ${e.message}"
+                                                    echo "Error from build.sh: ${e2.message}"
                                                 }
                                             }
                                         }
@@ -81,16 +83,21 @@ pipeline {
                             def configName = config.trim()
                             parallelStages["Package-and-Test-${platformName}-${configName}"] = {
                                 stage("Package and Test - ${platformName} - ${configName}") {
-                                    // steps { // Remove this line
                                         // Package
                                         dir('scripts') {
                                             try {
-                                                bat "build.sh ${platformName} ${configName} package"
+                                                bat "build.bat ${platformName} ${configName} package"
                                             } catch (Exception e) {
-                                                currentBuild.result = 'FAILURE'
-                                                echo "Package failed for platform ${platformName}, configuration ${configName}: ${e.message}"
-                                                echo "${e.printStackTrace()}"
-                                                error "Package failed for platform ${platformName}, configuration ${configName}"
+                                                echo "build.bat failed or not found for platform ${platform}, now trying build.sh."                                                
+                                                try {
+                                                    bat "sh build.sh ${platformName} ${configName} package"
+                                                } catch (Exception e2) {
+                                                    currentBuild.result = 'FAILURE'
+                                                    echo "Package failed for platform ${platformName}, configuration ${configName}: : Both build.bat and build.sh could not be executed."
+                                                    error "Package and Test failed for platform ${platformName}, configuration ${configName}"
+                                                    echo "Error from build.bat: ${e.message}"
+                                                    echo "Error from build.sh: ${e2.message}"
+                                                }
                                             }
                                         }
                                         // Test
@@ -104,7 +111,6 @@ pipeline {
                                                 error "Test failed for platform ${platformName}, configuration ${configName}"
                                             }
                                         }
-                                    // } // Remove this line
                                 }
                             }
                         }
