@@ -160,16 +160,20 @@ pipeline {
     post {
         always {
             script {
-                // Capturing end time as Long for consistency
+            // Capture the end time
             long endTime = new Date().time
-            // Convert START_TIME from String to Long before subtraction
+            // Ensure START_TIME is treated as a long integer
             long startTime = env.START_TIME.toLong()
+            // Calculate the duration
             long duration = endTime - startTime
-            int seconds = (int) (duration / 1000) % 60
-            int minutes = (int) ((duration / (1000 * 60)) % 60)
-            int hours = (int) ((duration / (1000 * 60 * 60)) % 24)
+            // Convert milliseconds to seconds before applying modulus for minutes and seconds
+            int totalSeconds = (int) (duration / 1000)
+            int seconds = totalSeconds % 60
+            int totalMinutes = totalSeconds / 60  
+            int minutes = totalMinutes % 60
+            int hours = totalMinutes / 60  
             String readableDuration = String.format("%02d:%02d:%02d", hours, minutes, seconds)
-            // Logging the total time taken for the pipeline
+            // Log the total time taken for the pipeline
             echo "Total time taken for the pipeline: ${readableDuration}"
             }
             echo 'Pipeline execution completed.'
