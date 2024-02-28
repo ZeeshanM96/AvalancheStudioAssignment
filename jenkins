@@ -1,5 +1,8 @@
 pipeline {
     agent any
+    options {
+        timestamps()
+    }
     environment {
         START_TIME = new Date().time
     }
