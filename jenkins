@@ -5,12 +5,12 @@ pipeline {
         choice(name: 'CONFIGURATIONS', choices: ['debug', 'final'], description: 'Select configurations')
     }
     stages {
-        // stage('Checkout') {
-        //     steps {
-        //         // Git checkout step
-        //         git branch: 'main', credentialsId: 'ZeeshanM96Token', url: 'https://github.com/ZeeshanM96/AvalancheStudioAssignment.git'
-        //     }
-        // }
+        stage('Checkout') {
+            steps {
+                // Git checkout step
+                git branch: 'main', credentialsId: 'ZeeshanM96Token', url: 'https://github.com/ZeeshanM96/AvalancheStudioAssignment.git'
+            }
+        }
         stage('Prepare') {
             steps {
                 script {
@@ -21,7 +21,6 @@ pipeline {
                         // Build content once per platform, configuration agnostic
                         parallelStages["Content-${platform}"] = {
                             stage("Build Content - ${platform}") {
-                                // steps { // Remove this line
                                     dir('resources') {
                                         try {
                                             bat "build.sh ${platform} build"
@@ -41,7 +40,7 @@ pipeline {
                             def configName = config.trim() // Declare inside the loop
                             parallelStages["Code-${platformName}-${configName}"] = {
                                 stage("Build Code - ${platformName} - ${configName}") {
-                                    steps { // Remove this line
+                                    // steps { // Remove this line
                                         dir('source') {
                                             try {
                                                 bat "build.sh ${platformName} ${configName} build"
