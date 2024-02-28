@@ -29,13 +29,12 @@ pipeline {
                                             try {
                                                 // If build.bat fails, try to run build.sh
                                                 bat label: 'Running build.sh', script: "build.sh ${platform} build"
-                                            }
-                                        catch (Exception shException) {
+                                            } catch (Exception shException) {
                                             currentBuild.result = 'FAILURE'
                                             echo "Build Content failed for platform ${platform}: ${shException.getMessage()}"
                                             echo "${e.printStackTrace()}"
                                             error "Build Content failed for platform ${platform}"
-                                        }
+                                            }
                                         }
                                     }
                             }
@@ -48,18 +47,24 @@ pipeline {
                                 stage("Build Code - ${platformName} - ${configName}") {
                                         dir('source') {
                                             try {
-                                                bat "build.sh ${platformName} ${configName} build"
-                                            } catch (Exception e) {
-                                                currentBuild.result = 'FAILURE'
-                                                echo "Build Code failed for platform ${platformName}, configuration ${configName}: ${e.message}"
-                                                echo "${e.printStackTrace()}"
-                                                error "Build Code failed for platform ${platformName}, configuration ${configName}"
+                                                // bat "build.sh ${platformName} ${configName} build"
+                                                bat label: 'Running build.bat', script: "build.bat ${platformName} ${configName} build"
+                                            } catch (Exception batException) {
+                                                echo "build.bat failed or does not exist, trying build.sh: ${batException.getMessage()}"
+                                                try {
+                                                    // If build.bat fails, try to run build.sh
+                                                    bat label: 'Running build.sh', script: "build.sh ${platformName} ${configName} build"
+                                                }catch (Exception e) {
+                                                    currentBuild.result = 'FAILURE'
+                                                    echo "Build Code failed for platform ${platformName}, configuration ${configName}: ${e.message}"
+                                                    echo "${e.printStackTrace()}"
+                                                    error "Build Code failed for platform ${platformName}, configuration ${configName}"
+                                                }
                                             }
                                         }
+                                    }
                                 }
                             }
-                        }
-                    }
 
                     // Execute code and content build stages in parallel
                     parallel parallelStages
@@ -78,7 +83,6 @@ pipeline {
                             def configName = config.trim()
                             parallelStages["Package-and-Test-${platformName}-${configName}"] = {
                                 stage("Package and Test - ${platformName} - ${configName}") {
-                                    // steps { // Remove this line
                                         // Package
                                         dir('scripts') {
                                             try {
@@ -101,7 +105,6 @@ pipeline {
                                                 error "Test failed for platform ${platformName}, configuration ${configName}"
                                             }
                                         }
-                                    // } // Remove this line
                                 }
                             }
                         }
