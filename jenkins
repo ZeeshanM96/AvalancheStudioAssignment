@@ -1,8 +1,9 @@
 pipeline {
     agent any
+    environment {
+        START_TIME = new Date().time
+    }
     parameters {
-        // choice(name: 'PLATFORMS', choices: ['Steam', 'Epic', 'XboxOne'], description: 'Select platforms')
-        // choice(name: 'CONFIGURATIONS', choices: ['debug', 'final'], description: 'Select configurations')
         extendedChoice(
             name: 'PLATFORMS',
             type: 'PT_CHECKBOX',
@@ -150,6 +151,16 @@ pipeline {
     }
     post {
         always {
+            script {
+                // Capturing end time
+                def endTime = new Date().time
+                // Calculating duration in milliseconds
+                def duration = endTime - env.START_TIME
+                // Converting duration from milliseconds to a more readable format
+                def readableDuration = DurationFormatUtils.formatDuration(duration, 'HH:mm:ss,SSS', true)
+                // Logging the total time taken for the pipeline
+                echo "Total time taken for the pipeline: ${readableDuration}"
+            }
             echo 'Pipeline execution completed.'
         }
         failure {
