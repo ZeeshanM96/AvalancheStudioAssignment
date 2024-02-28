@@ -36,6 +36,8 @@ pipeline {
         stage('Prepare') {
             steps {
                 script {
+                    echo "Selected platforms: ${params.PLATFORMS}"
+                    echo "Selected configurations: ${params.CONFIGURATIONS}"
                     def platforms = params.PLATFORMS.tokenize(',')
                     def configurations = params.CONFIGURATIONS.tokenize(',')
                     def parallelStages = [:]
