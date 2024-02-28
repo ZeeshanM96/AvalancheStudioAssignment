@@ -17,7 +17,14 @@ pipeline {
                             stage("Build Content - ${platform}") {
                                 steps {
                                     dir('resources') {
-                                        bat "build.sh ${platform} build"
+                                        try {
+                                            bat "build.sh ${platform} build"
+                                        } catch (Exception e) {
+                                            currentBuild.result = 'FAILURE'
+                                            echo "Build Content failed for platform ${platform}: ${e.message}"
+                                            echo "${e.printStackTrace()}"
+                                            error "Build Content failed for platform ${platform}"
+                                        }
                                     }
                                 }
                             }
@@ -30,7 +37,14 @@ pipeline {
                                 stage("Build Code - ${platformName} - ${configName}") {
                                     steps {
                                         dir('source') {
-                                            bat "build.sh ${platformName} ${configName} build"
+                                            try {
+                                                bat "build.sh ${platformName} ${configName} build"
+                                            } catch (Exception e) {
+                                                currentBuild.result = 'FAILURE'
+                                                echo "Build Code failed for platform ${platformName}, configuration ${configName}: ${e.message}"
+                                                echo "${e.printStackTrace()}"
+                                                error "Build Code failed for platform ${platformName}, configuration ${configName}"
+                                            }
                                         }
                                     }
                                 }
@@ -58,11 +72,25 @@ pipeline {
                                     steps {
                                         // Package
                                         dir('scripts') {
-                                            bat "build.sh ${platformName} ${configName} package"
+                                            try {
+                                                bat "build.sh ${platformName} ${configName} package"
+                                            } catch (Exception e) {
+                                                currentBuild.result = 'FAILURE'
+                                                echo "Package failed for platform ${platformName}, configuration ${configName}: ${e.message}"
+                                                echo "${e.printStackTrace()}"
+                                                error "Package failed for platform ${platformName}, configuration ${configName}"
+                                            }
                                         }
                                         // Test
                                         dir('scripts') {
-                                            bat "build.sh ${platformName} ${configName} test"
+                                            try {
+                                                bat "build.sh ${platformName} ${configName} test"
+                                            } catch (Exception e) {
+                                                currentBuild.result = 'FAILURE'
+                                                echo "Test failed for platform ${platformName}, configuration ${configName}: ${e.message}"
+                                                echo "${e.printStackTrace()}"
+                                                error "Test failed for platform ${platformName}, configuration ${configName}"
+                                            }
                                         }
                                     }
                                 }
@@ -78,6 +106,11 @@ pipeline {
     post {
         always {
             echo 'Pipeline execution completed.'
+        }
+        failure {
+            echo "Build failed on ${env.STAGE_NAME} stage"
+            echo "Failure cause: ${currentBuild.result}"
+            // Add any additional logging or actions for failure
         }
     }
 }
