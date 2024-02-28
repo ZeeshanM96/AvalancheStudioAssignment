@@ -17,7 +17,7 @@ pipeline {
                             stage("Build Content - ${platform}") {
                                 steps {
                                     dir('resources') {
-                                        bat "build.bat ${platform} build"
+                                        bat "build.sh ${platform} build"
                                     }
                                 }
                             }
@@ -30,7 +30,7 @@ pipeline {
                                 stage("Build Code - ${platformName} - ${configName}") {
                                     steps {
                                         dir('source') {
-                                            bat "build.bat ${platformName} ${configName} build"
+                                            bat "build.sh ${platformName} ${configName} build"
                                         }
                                     }
                                 }
@@ -58,11 +58,11 @@ pipeline {
                                     steps {
                                         // Package
                                         dir('scripts') {
-                                            bat "build.bat ${platformName} ${configName} package"
+                                            bat "build.sh ${platformName} ${configName} package"
                                         }
                                         // Test
                                         dir('scripts') {
-                                            bat "build.bat ${platformName} ${configName} test"
+                                            bat "build.sh ${platformName} ${configName} test"
                                         }
                                     }
                                 }
