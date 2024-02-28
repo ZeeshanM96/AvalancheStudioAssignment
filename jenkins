@@ -42,19 +42,20 @@ pipeline {
                     echo "Selected configurations: ${configurations}"
                     def parallelStages = [:]
                     for (platform in platforms) {
+                        def currentPlatform = platform
                         // Build content once per platform, configuration agnostic
-                        parallelStages["Content-${platform}"] = {
-                            stage("Build Content - ${platform}") {
+                        parallelStages["Content-${currentPlatform}"] = {
+                            stage("Build Content - ${currentPlatform}") {
                                     dir('resources') {
                                         try {
-                                            bat "build.bat ${platform} build"
+                                            bat "build.bat ${currentPlatform} build"
                                         } catch (Exception e) {
-                                            echo "build.bat failed or not found for platform ${platform}, now trying build.sh."
+                                            echo "build.bat failed or not found for platform ${currentPlatform}, now trying build.sh."
                                             try {
-                                                bat "build.sh ${platform} build"
+                                                bat "build.sh ${currentPlatform} build"
                                             } catch (Exception e2) {
                                                 currentBuild.result = 'FAILURE'
-                                                echo "Build Content failed for platform ${platform}: Both build.bat and build.sh could not be executed."
+                                                echo "Build Content failed for platform ${currentPlatform}: Both build.bat and build.sh could not be executed."
                                                 echo "Error from build.bat: ${e.message}"
                                                 echo "Error from build.sh: ${e2.message}"
                                             }
