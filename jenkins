@@ -109,6 +109,71 @@ pipeline {
                 }
             }
         }
+        // stage('Package and Test') {
+        //     steps {
+        //         script {
+        //             def platforms = params.PLATFORMS.tokenize(',')
+        //             def configurations = params.CONFIGURATIONS.tokenize(',')
+        //             def parallelStages = [:]
+        //             for (platform in platforms) {
+        //                 for (config in configurations) {
+        //                     def platformName = platform.trim()
+        //                     def configName = config.trim()
+        //                     parallelStages["Package-and-Test-${platformName}-${configName}"] = {
+        //                         stage("Package and Test - ${platformName} - ${configName}") {
+        //                                 script {
+        //                                     // Check if build artifacts exist
+        //                                     boolean codeBuildSuccess = fileExists "Artifacts\\${platformName}_${configName}_code.flag"
+        //                                     boolean contentBuildSuccess = fileExists "Artifacts\\${platformName}_content.flag"
+        //                                     echo "Checked if the build artifacts exist - ${codeBuildSuccess} - ${contentBuildSuccess} "
+        //                                     if (codeBuildSuccess && contentBuildSuccess) {
+        //                                         // Package
+        //                                         dir('scripts') {
+        //                                             try {
+        //                                                 bat "build.bat ${platformName} ${configName} package"
+        //                                                 // Indicate package success
+        //                                                 writeFile file: "Artifacts/${platformName}_${configName}_package.flag", text: 'success'
+        //                                             } catch (Exception e) {
+        //                                                 echo "build.bat failed or not found for platform ${platformName} & configuration ${configName}, now trying build.sh."
+        //                                                 try {
+        //                                                     bat "sh build.sh ${platformName} ${configName} package"
+        //                                                 } catch (Exception e2) {
+        //                                                     currentBuild.result = 'FAILURE'
+        //                                                     echo "Package failed for platform ${platformName}, configuration ${configName}: Both build.bat and build.sh could not be executed."
+        //                                                     echo "Error from build.bat: ${e.message}"
+        //                                                     echo "Error from build.sh: ${e2.message}"
+        //                                                 }
+        //                                             }
+        //                                         }
+        //                                         // Test
+        //                                         dir('scripts') {
+        //                                             try {
+        //                                                 bat "build.bat ${platformName} ${configName} test"
+        //                                             } catch (Exception e) {
+        //                                                 echo "build.bat failed or not found for platform ${platformName} & configuration ${configName}, now trying build.sh."
+        //                                                 try {
+        //                                                     bat "sh build.sh ${platformName} ${configName} test"
+        //                                                 } catch (Exception e2) {
+        //                                                     currentBuild.result = 'FAILURE'
+        //                                                     echo "Test failed for platform ${platformName}, configuration ${configName}: Both build.bat and build.sh could not be executed."
+        //                                                     echo "Error from build.bat: ${e.message}"
+        //                                                     echo "Error from build.sh: ${e2.message}"
+        //                                                 }
+        //                                             }
+        //                                         }
+        //                                     } else {
+        //                                         echo "Skipping Package and Test for ${platformName} - ${configName} due to missing build artifacts."
+        //                                     }
+        //                                 }
+        //                         }
+        //                     }
+        //                 }
+        //             }
+        //             // Execute packaging and testing in parallel
+        //             parallel parallelStages
+        //         }
+        //     }
+        // }
         stage('Package and Test') {
             steps {
                 script {
@@ -121,50 +186,41 @@ pipeline {
                             def configName = config.trim()
                             parallelStages["Package-and-Test-${platformName}-${configName}"] = {
                                 stage("Package and Test - ${platformName} - ${configName}") {
-                                        script {
-                                            // Check if build artifacts exist
-                                            boolean codeBuildSuccess = fileExists "Artifacts\\${platformName}_${configName}_code.flag"
-                                            boolean contentBuildSuccess = fileExists "Artifacts\\${platformName}_content.flag"
-                                            echo "Checked if the build artifacts exist - ${codeBuildSuccess} - ${contentBuildSuccess} "
-                                            if (codeBuildSuccess && contentBuildSuccess) {
-                                                // Package
-                                                dir('scripts') {
-                                                    try {
-                                                        bat "build.bat ${platformName} ${configName} package"
-                                                        // Indicate package success
-                                                        writeFile file: "Artifacts/${platformName}_${configName}_package.flag", text: 'success'
-                                                    } catch (Exception e) {
-                                                        echo "build.bat failed or not found for platform ${platformName} & configuration ${configName}, now trying build.sh."
-                                                        try {
-                                                            bat "sh build.sh ${platformName} ${configName} package"
-                                                        } catch (Exception e2) {
-                                                            currentBuild.result = 'FAILURE'
-                                                            echo "Package failed for platform ${platformName}, configuration ${configName}: Both build.bat and build.sh could not be executed."
-                                                            echo "Error from build.bat: ${e.message}"
-                                                            echo "Error from build.sh: ${e2.message}"
-                                                        }
-                                                    }
+                                    script {
+                                        // Check if build artifacts exist
+                                        boolean codeBuildSuccess = fileExists "Artifacts\\${platformName}_${configName}_code.flag"
+                                        boolean contentBuildSuccess = fileExists "Artifacts\\${platformName}_content.flag"
+                                        echo "Checked if the build artifacts exist - ${codeBuildSuccess} - ${contentBuildSuccess}"
+                                        if (codeBuildSuccess && contentBuildSuccess) {
+                                            // Package
+                                            dir('scripts') {
+                                                try {
+                                                    bat "build.bat ${platformName} ${configName} package"
+                                                    // Create a flag file to indicate package success
+                                                    writeFile file: "../Artifacts/${platformName}_${configName}_package.flag", text: 'success'
+                                                } catch (Exception e) {
+                                                    currentBuild.result = 'FAILURE'
+                                                    echo "Package failed for platform ${platformName}, configuration ${configName}: ${e.message}"
                                                 }
-                                                // Test
+                                            }
+                                            // Check if package was successful before testing
+                                            boolean packageSuccess = fileExists "Artifacts\\${platformName}_${configName}_package.flag"
+                                            if (packageSuccess) {
                                                 dir('scripts') {
                                                     try {
                                                         bat "build.bat ${platformName} ${configName} test"
                                                     } catch (Exception e) {
-                                                        echo "build.bat failed or not found for platform ${platformName} & configuration ${configName}, now trying build.sh."
-                                                        try {
-                                                            bat "sh build.sh ${platformName} ${configName} test"
-                                                        } catch (Exception e2) {
-                                                            currentBuild.result = 'FAILURE'
-                                                            echo "Test failed for platform ${platformName}, configuration ${configName}: Both build.bat and build.sh could not be executed."
-                                                            echo "Error from build.bat: ${e.message}"
-                                                            echo "Error from build.sh: ${e2.message}"
-                                                        }
+                                                        currentBuild.result = 'FAILURE'
+                                                        echo "Test failed for platform ${platformName}, configuration ${configName}: ${e.message}"
                                                     }
                                                 }
                                             } else {
-                                                echo "Skipping Package and Test for ${platformName} - ${configName} due to missing build artifacts."
+                                                echo "Skipping Test for ${platformName} - ${configName} due to missing package."
                                             }
+                                        } else {
+                                            echo "Skipping Package and Test for ${platformName} - ${configName} due to missing build artifacts."
                                         }
+                                    }
                                 }
                             }
                         }
