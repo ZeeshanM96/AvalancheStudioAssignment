@@ -30,13 +30,9 @@ pipeline {
             steps {
                 script {
                     if (fileExists('Artifacts')) {
-                        // If it exists, delete the entire directory
-                        deleteDir() // This deletes all files and folders in the current directory, not just 'Artifacts'
+                        deleteDir() 
                     }
-                    // Recreate the 'Artifacts' directory
                     dir('Artifacts') {
-                        // This block creates the 'Artifacts' directory if it doesn't exist
-                        // and does nothing if it already exists, but since we've just deleted it, it will create a new one.
                         echo "Created Artifacts directory"
                         env.START_TIME = "${new Date().time}"
                     }
@@ -112,6 +108,7 @@ pipeline {
         stage('Package and Test') {
             steps {
                 script {
+                    echo "Starting the Package and Test Stage"
                     def platforms = params.PLATFORMS.tokenize(',')
                     def configurations = params.CONFIGURATIONS.tokenize(',')
                     def parallelStages = [:]
@@ -123,10 +120,11 @@ pipeline {
                                 stage("Package and Test - ${platformName} - ${configName}") {
                                     steps {
                                         script {
+                                            echo "Checking if the build artifacts exist"
                                             // Check if build artifacts exist
                                             boolean codeBuildSuccess = fileExists "Artifacts/${platformName}_${configName}_code.flag"
                                             boolean contentBuildSuccess = fileExists "Artifacts/${platformName}_content.flag"
-
+                                            echo "Checked if the build artifacts exist"
                                             if (codeBuildSuccess && contentBuildSuccess) {
                                                 // Package
                                                 dir('scripts') {
