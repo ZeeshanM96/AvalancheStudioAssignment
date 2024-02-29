@@ -194,28 +194,45 @@ pipeline {
                                         if (codeBuildSuccess && contentBuildSuccess) {
                                             // Package
                                             dir('scripts') {
+                                                boolean packageAttempted = false
                                                 try {
                                                     bat "build.bat ${platformName} ${configName} package"
-                                                    // Create a flag file to indicate package success
                                                     writeFile file: "../Artifacts/${platformName}_${configName}_package.flag", text: 'success'
+                                                    packageAttempted = true
                                                 } catch (Exception e) {
-                                                    currentBuild.result = 'FAILURE'
-                                                    echo "Package failed for platform ${platformName}, configuration ${configName}: ${e.message}"
-                                                }
-                                            }
-                                            // Check if package was successful before testing
-                                            boolean packageSuccess = fileExists "Artifacts\\${platformName}_${configName}_package.flag"
-                                            if (packageSuccess) {
-                                                dir('scripts') {
+                                                    echo "build.bat failed for platform ${platformName} & configuration ${configName}, now trying build.sh."
                                                     try {
-                                                        bat "build.bat ${platformName} ${configName} test"
-                                                    } catch (Exception e) {
+                                                        sh "build.sh ${platformName} ${configName} package"
+                                                        writeFile file: "../Artifacts/${platformName}_${configName}_package.flag", text: 'success'
+                                                        packageAttempted = true
+                                                    } catch (Exception e2) {
                                                         currentBuild.result = 'FAILURE'
-                                                        echo "Test failed for platform ${platformName}, configuration ${configName}: ${e.message}"
+                                                        echo "Package failed for platform ${platformName}, configuration ${configName}: Both build.bat and build.sh could not be executed."
+                                                        echo "Error from build.bat: ${e.message}"
+                                                        echo "Error from build.sh: ${e2.message}"
                                                     }
                                                 }
-                                            } else {
-                                                echo "Skipping Test for ${platformName} - ${configName} due to missing package."
+                                                // Test only if package was attempted (either bat or sh succeeded)
+                                                if (packageAttempted) {
+                                                    boolean packageSuccess = fileExists "Artifacts\\${platformName}_${configName}_package.flag"
+                                                    if (packageSuccess) {
+                                                        try {
+                                                            bat "build.bat ${platformName} ${configName} test"
+                                                        } catch (Exception e) {
+                                                            echo "build.bat failed for platform ${platformName} & configuration ${configName}, now trying build.sh."
+                                                            try {
+                                                                sh "build.sh ${platformName} ${configName} test"
+                                                            } catch (Exception e2) {
+                                                                currentBuild.result = 'FAILURE'
+                                                                echo "Test failed for platform ${platformName}, configuration ${configName}: Both build.bat and build.sh could not be executed."
+                                                                echo "Error from build.bat: ${e.message}"
+                                                                echo "Error from build.sh: ${e2.message}"
+                                                            }
+                                                        }
+                                                    } else {
+                                                        echo "Skipping Test for ${platformName} - ${configName} due to missing package."
+                                                    }
+                                                }
                                             }
                                         } else {
                                             echo "Skipping Package and Test for ${platformName} - ${configName} due to missing build artifacts."
