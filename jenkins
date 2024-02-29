@@ -124,9 +124,9 @@ pipeline {
                                         script {
                                             echo "Checking if the build artifacts exist"
                                             // Check if build artifacts exist
-                                            boolean codeBuildSuccess = fileExists "Artifacts/${platformName}_${configName}_code.flag"
-                                            boolean contentBuildSuccess = fileExists "Artifacts/${platformName}_content.flag"
-                                            echo "Checked if the build artifacts exist"
+                                            boolean codeBuildSuccess = fileExists "Artifacts//${platformName}_${configName}_code.flag"
+                                            boolean contentBuildSuccess = fileExists "Artifacts//${platformName}_content.flag"
+                                            echo "Checked if the build artifacts exist - ${codeBuildSuccess} - ${contentBuildSuccess} "
                                             if (codeBuildSuccess && contentBuildSuccess) {
                                                 // Package
                                                 dir('scripts') {
