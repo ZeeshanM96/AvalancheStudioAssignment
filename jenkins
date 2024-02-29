@@ -29,10 +29,15 @@ pipeline {
         stage('Initialize') {
             steps {
                 script {
-                    // if (fileExists('Artifacts')) {
-                    //     deleteDir('Artifacts') 
-                    // }
-                    // mkdir 'Artifacts'
+                    if (fileExists('Artifacts')) {
+                        // If it exists, delete the entire directory
+                        deleteDir() // This deletes all files and folders in the current directory, not just 'Artifacts'
+                    }
+                    // Recreate the 'Artifacts' directory
+                    dir('Artifacts') {
+                        // This block creates the 'Artifacts' directory if it doesn't exist
+                        // and does nothing if it already exists, but since we've just deleted it, it will create a new one.
+                        echo "Created Artifacts directory"
                     env.START_TIME = "${new Date().time}"
                 }
             }
