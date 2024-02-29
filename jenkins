@@ -119,6 +119,7 @@ pipeline {
                             def platformName = platform.trim()
                             def configName = config.trim()
                             parallelStages["Package-and-Test-${platformName}-${configName}"] = {
+                                echo "HERE IN parallelStages LOOP"
                                 stage("Package and Test - ${platformName} - ${configName}") {
                                     steps {
                                         script {
