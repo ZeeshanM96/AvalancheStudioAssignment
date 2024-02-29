@@ -29,10 +29,10 @@ pipeline {
         stage('Initialize') {
             steps {
                 script {
-                    if (fileExists('Artifacts')) {
-                        deleteDir('Artifacts') 
-                    }
-                    mkdir 'Artifacts'
+                    // if (fileExists('Artifacts')) {
+                    //     deleteDir('Artifacts') 
+                    // }
+                    // mkdir 'Artifacts'
                     env.START_TIME = "${new Date().time}"
                 }
             }
