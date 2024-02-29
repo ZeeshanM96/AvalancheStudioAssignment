@@ -125,7 +125,6 @@ pipeline {
                                         // Check if build artifacts exist
                                         boolean codeBuildSuccess = fileExists "Artifacts\\${platformName}_${configName}_code.flag"
                                         boolean contentBuildSuccess = fileExists "Artifacts\\${platformName}_content.flag"
-                                        echo "Checked if the build artifacts exist - ${codeBuildSuccess} - ${contentBuildSuccess}"
                                         if (codeBuildSuccess && contentBuildSuccess) {
                                             // Package
                                             dir('scripts') {
@@ -150,7 +149,6 @@ pipeline {
                                                 // Test only if package was attempted (either bat or sh succeeded)                                           
                                                 if (packageAttempted) {
                                                     boolean packageSuccess = fileExists "${WORKSPACE}\\Artifacts\\${platformName}_${configName}_package.flag"
-                                                    echo "Package Success was - ${packageSuccess}"
                                                     if (packageSuccess) {
                                                         try {
                                                             bat "build.bat ${platformName} ${configName} test"
@@ -199,10 +197,6 @@ pipeline {
             echo "Total time taken for the pipeline: ${readableDuration}"
             }
             echo 'Pipeline execution completed.'
-            // Archive the JAR files produced by the build
-            archiveArtifacts artifacts: 'build/libs/**/*.jar', fingerprint: true
-            // Publish JUnit test results
-            junit 'build/reports/**/*.xml'
         }
         failure {
             echo "Build failed on ${env.STAGE_NAME} stage"
