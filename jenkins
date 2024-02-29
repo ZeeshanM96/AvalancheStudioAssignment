@@ -212,10 +212,11 @@ pipeline {
                                                         echo "Error from build.sh: ${e2.message}"
                                                     }
                                                 }
-                                                // Test only if package was attempted (either bat or sh succeeded)
-                                                
+                                                // Test only if package was attempted (either bat or sh succeeded)                                           
                                                 if (packageAttempted) {
                                                     bat "dir C:\\ProgramData\\Jenkins\\.jenkins\\workspace\\MultiPlatformPackageBuilder\\Artifacts"
+                                                    echo "Checking for package flag file at: Artifacts\\${platformName}_${configName}_package.flag"
+                                                    bat "cd"  // This will print the current directory in Windows
                                                     echo "Checking for package flag file at: Artifacts\\${platformName}_${configName}_package.flag"
                                                     boolean packageSuccess = fileExists "Artifacts\\${platformName}_${configName}_package.flag"
                                                     echo "Package Success was - ${packageSuccess}"
