@@ -38,7 +38,8 @@ pipeline {
                         // This block creates the 'Artifacts' directory if it doesn't exist
                         // and does nothing if it already exists, but since we've just deleted it, it will create a new one.
                         echo "Created Artifacts directory"
-                    env.START_TIME = "${new Date().time}"
+                        env.START_TIME = "${new Date().time}"
+                    }
                 }
             }
         }
