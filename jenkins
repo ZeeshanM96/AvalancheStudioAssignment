@@ -60,10 +60,12 @@ pipeline {
                                     dir('resources') {
                                         try {
                                             bat "build.bat ${currentPlatform} build"
+                                            writeFile file: "../Artifacts/${currentPlatform}_content.flag", text: 'success'
                                         } catch (Exception e) {
                                             echo "build.bat failed or not found for platform ${currentPlatform}, now trying build.sh."
                                             try {
                                                 bat "build.sh ${currentPlatform} build"
+                                                writeFile file: "../Artifacts/${currentPlatform}_content.flag", text: 'success'
                                             } catch (Exception e2) {
                                                 currentBuild.result = 'FAILURE'
                                                 echo "Build Content failed for platform ${currentPlatform}: Both build.bat and build.sh could not be executed."
@@ -83,10 +85,12 @@ pipeline {
                                         dir('source') {
                                             try {
                                                 bat "build.bat ${platformName} ${configName} build"
+                                                writeFile file: "../Artifacts/${platformName}_${configName}_code.flag", text: 'success'
                                             } catch (Exception e) {
                                                 echo "build.bat failed or not found for platform ${platform} & configuration ${configName}, now trying build.sh."
                                                 try {
                                                     bat "sh build.sh ${platformName} ${configName} build"
+                                                    writeFile file: "../Artifacts/${platformName}_${configName}_code.flag", text: 'success'
                                                 } catch (Exception e2) {
                                                     currentBuild.result = 'FAILURE'
                                                     echo "Build Code failed for platform ${platformName}, configuration ${configName}: Both build.bat and build.sh could not be executed."
@@ -124,8 +128,8 @@ pipeline {
                                         script {
                                             echo "Checking if the build artifacts exist"
                                             // Check if build artifacts exist
-                                            boolean codeBuildSuccess = fileExists "Artifacts//${platformName}_${configName}_code.flag"
-                                            boolean contentBuildSuccess = fileExists "Artifacts//${platformName}_content.flag"
+                                            boolean codeBuildSuccess = fileExists "Artifacts\\${platformName}_${configName}_code.flag"
+                                            boolean contentBuildSuccess = fileExists "Artifacts\\${platformName}_content.flag"
                                             echo "Checked if the build artifacts exist - ${codeBuildSuccess} - ${contentBuildSuccess} "
                                             if (codeBuildSuccess && contentBuildSuccess) {
                                                 // Package
