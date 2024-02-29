@@ -215,6 +215,8 @@ pipeline {
                                                 // Test only if package was attempted (either bat or sh succeeded)
                                                 
                                                 if (packageAttempted) {
+                                                    bat "dir C:\\ProgramData\\Jenkins\\.jenkins\\workspace\\MultiPlatformPackageBuilder\\Artifacts"
+                                                    echo "Checking for package flag file at: Artifacts\\${platformName}_${configName}_package.flag"
                                                     boolean packageSuccess = fileExists "Artifacts\\${platformName}_${configName}_package.flag"
                                                     echo "Package Success was - ${packageSuccess}"
                                                     if (packageSuccess) {
