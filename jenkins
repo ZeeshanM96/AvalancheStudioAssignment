@@ -113,7 +113,9 @@ pipeline {
                     def configurations = params.CONFIGURATIONS.tokenize(',')
                     def parallelStages = [:]
                     for (platform in platforms) {
+                        echo "HERE IN PLATFORMS LOOP"
                         for (config in configurations) {
+                            echo "HERE IN CONFIGURATION LOOP"
                             def platformName = platform.trim()
                             def configName = config.trim()
                             parallelStages["Package-and-Test-${platformName}-${configName}"] = {
