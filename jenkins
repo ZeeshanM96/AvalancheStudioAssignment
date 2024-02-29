@@ -123,8 +123,8 @@ pipeline {
                                 stage("Package and Test - ${platformName} - ${configName}") {
                                     script {
                                         // Check if build artifacts exist
-                                        boolean codeBuildSuccess = fileExists "${WORKSPACE}Artifacts\\${platformName}_${configName}_code.flag"
-                                        boolean contentBuildSuccess = fileExists "${WORKSPACE}Artifacts\\${platformName}_content.flag"
+                                        boolean codeBuildSuccess = fileExists "Artifacts\\${platformName}_${configName}_code.flag"
+                                        boolean contentBuildSuccess = fileExists "Artifacts\\${platformName}_content.flag"
                                         if (codeBuildSuccess && contentBuildSuccess) {
                                             // Package
                                             dir('scripts') {
