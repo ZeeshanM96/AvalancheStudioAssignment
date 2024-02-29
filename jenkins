@@ -218,7 +218,7 @@ pipeline {
                                                     echo "Checking for package flag file at: Artifacts\\${platformName}_${configName}_package.flag"
                                                     bat "cd"  // This will print the current directory in Windows
                                                     echo "Checking for package flag file at: Artifacts\\${platformName}_${configName}_package.flag"
-                                                    boolean packageSuccess = fileExists "Artifacts\\${platformName}_${configName}_package.flag"
+                                                    boolean packageSuccess = fileExists "${WORKSPACE}\\Artifacts\\${platformName}_${configName}_package.flag"
                                                     echo "Package Success was - ${packageSuccess}"
                                                     if (packageSuccess) {
                                                         try {
