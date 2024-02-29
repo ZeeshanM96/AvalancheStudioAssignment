@@ -199,6 +199,10 @@ pipeline {
             echo "Total time taken for the pipeline: ${readableDuration}"
             }
             echo 'Pipeline execution completed.'
+            // Archive the JAR files produced by the build
+            archiveArtifacts artifacts: 'build/libs/**/*.jar', fingerprint: true
+            // Publish JUnit test results
+            junit 'build/reports/**/*.xml'
         }
         failure {
             echo "Build failed on ${env.STAGE_NAME} stage"
