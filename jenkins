@@ -109,24 +109,51 @@ pipeline {
                 }
             }
         }
+        stage('Check Artifacts') {
+            steps {
+                script {
+                    // List the contents of the Artifacts directory
+                    echo "Listing contents of the Artifacts directory:"
+                    bat "dir Artifacts"
+
+                    // Assuming you have a list of platforms and configurations from parameters or previous stages
+                    def platforms = params.PLATFORMS.tokenize(',')
+                    def configurations = params.CONFIGURATIONS.tokenize(',')
+
+                    // Iterate over each platform and configuration to check the respective flag files
+                    platforms.each { platform ->
+                        configurations.each { config ->
+                            // Define the file names based on platform and configuration
+                            def codeFlagFilePath = "Artifacts\\${platform}_${config}_code.flag"
+                            def contentFlagFilePath = "Artifacts\\${platform}_content.flag"
+
+                            // Check if the code build success flag file exists and print its contents
+                            echo "Checking content of: ${codeFlagFilePath}"
+                            bat "type ${codeFlagFilePath}"
+
+                            // Check if the content build success flag file exists and print its contents
+                            // Note: This could be moved outside the configuration loop if content builds are not configuration-dependent
+                            echo "Checking content of: ${contentFlagFilePath}"
+                            bat "type ${contentFlagFilePath}"
+                        }
+                    }
+                }
+            }
+        }
+
         stage('Package and Test') {
             steps {
                 script {
-                    echo "Starting the Package and Test Stage"
                     def platforms = params.PLATFORMS.tokenize(',')
                     def configurations = params.CONFIGURATIONS.tokenize(',')
                     def parallelStages = [:]
                     for (platform in platforms) {
-                        echo "HERE IN PLATFORMS LOOP"
                         for (config in configurations) {
-                            echo "HERE IN CONFIGURATION LOOP"
                             def platformName = platform.trim()
                             def configName = config.trim()
                             parallelStages["Package-and-Test-${platformName}-${configName}"] = {
-                                echo "HERE IN parallelStages LOOP"
                                 stage("Package and Test - ${platformName} - ${configName}") {
                                         script {
-                                            echo "Checking if the build artifacts exist"
                                             // Check if build artifacts exist
                                             boolean codeBuildSuccess = fileExists "Artifacts\\${platformName}_${configName}_code.flag"
                                             boolean contentBuildSuccess = fileExists "Artifacts\\${platformName}_content.flag"
