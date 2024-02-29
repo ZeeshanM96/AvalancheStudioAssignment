@@ -213,6 +213,7 @@ pipeline {
                                                     }
                                                 }
                                                 // Test only if package was attempted (either bat or sh succeeded)
+                                                echo ${packageAttempted}
                                                 if (packageAttempted) {
                                                     boolean packageSuccess = fileExists "Artifacts\\${platformName}_${configName}_package.flag"
                                                     if (packageSuccess) {
