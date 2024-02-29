@@ -109,38 +109,6 @@ pipeline {
                 }
             }
         }
-        stage('Check Artifacts') {
-            steps {
-                script {
-                    // List the contents of the Artifacts directory
-                    echo "Listing contents of the Artifacts directory:"
-                    bat "dir Artifacts"
-
-                    // Assuming you have a list of platforms and configurations from parameters or previous stages
-                    def platforms = params.PLATFORMS.tokenize(',')
-                    def configurations = params.CONFIGURATIONS.tokenize(',')
-
-                    // Iterate over each platform and configuration to check the respective flag files
-                    platforms.each { platform ->
-                        configurations.each { config ->
-                            // Define the file names based on platform and configuration
-                            def codeFlagFilePath = "Artifacts\\${platform}_${config}_code.flag"
-                            def contentFlagFilePath = "Artifacts\\${platform}_content.flag"
-
-                            // Check if the code build success flag file exists and print its contents
-                            echo "Checking content of: ${codeFlagFilePath}"
-                            bat "type ${codeFlagFilePath}"
-
-                            // Check if the content build success flag file exists and print its contents
-                            // Note: This could be moved outside the configuration loop if content builds are not configuration-dependent
-                            echo "Checking content of: ${contentFlagFilePath}"
-                            bat "type ${contentFlagFilePath}"
-                        }
-                    }
-                }
-            }
-        }
-
         stage('Package and Test') {
             steps {
                 script {
