@@ -58,15 +58,15 @@ pipeline {
                         parallelStages["Content-${currentPlatform}"] = {
                             stage("Build Content - ${currentPlatform}") {
                                     dir('resources') {
-                                        boolean buildSuccess = false
+                                        boolean contentbuildSuccess = false
                                         try {
                                             bat "build.bat ${currentPlatform} build"
-                                            buildSuccess = true
+                                            contentbuildSuccess = true
                                         } catch (Exception e) {
                                             echo "build.bat failed or not found for platform ${currentPlatform}, now trying build.sh."
                                             try {
                                                 bat "build.sh ${currentPlatform} build"
-                                                buildSuccess = true
+                                                contentbuildSuccess = true
                                             } catch (Exception e2) {
                                                 currentBuild.result = 'FAILURE'
                                                 echo "Build Content failed for platform ${currentPlatform}: Both build.bat and build.sh could not be executed."
@@ -74,7 +74,7 @@ pipeline {
                                                 echo "Error from build.sh: ${e2.message}"
                                             }
                                         }
-                                        if (buildSuccess) {
+                                        if (contentbuildSuccess) {
                                             if (!fileExists('content_output')) {
                                                 echo "content_output directory does not exist, creating..."
                                                 bat 'mkdir content_output'
@@ -94,15 +94,15 @@ pipeline {
                             parallelStages["Code-${platformName}-${configName}"] = {
                                 stage("Build Code - ${platformName} - ${configName}") {
                                         dir('source') {
-                                            boolean buildSuccess = false
+                                            boolean codebuildSuccess = false
                                             try {
                                                 bat "build.bat ${platformName} ${configName} build"
-                                                boolean buildSuccess = true
+                                                boolean codebuildSuccess = true
                                             } catch (Exception e) {
                                                 echo "build.bat failed or not found for platform ${platformName} & configuration ${configName}, now trying build.sh."
                                                 try {
                                                     bat "build.sh ${platformName} ${configName} build"
-                                                    boolean buildSuccess = true
+                                                    boolean codebuildSuccess = true
                                                 } catch (Exception e2) {
                                                     currentBuild.result = 'FAILURE'
                                                     echo "Build Code failed for platform ${platformName}, configuration ${configName}: Both build.bat and build.sh could not be executed."
@@ -110,7 +110,7 @@ pipeline {
                                                     echo "Error from build.sh: ${e2.message}"
                                                 }
                                             }
-                                            if (buildSuccess) {
+                                            if (codebuildSuccess) {
                                             if (!fileExists('content_output')) {
                                                 echo "content_output directory does not exist, creating..."
                                                 bat 'mkdir content_output'
