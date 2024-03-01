@@ -114,7 +114,7 @@ pipeline {
                                             } catch (Exception e) {
                                                 echo "build.bat failed or not found for platform ${platformName} & configuration ${configName}, now trying build.sh."
                                                 try {
-                                                    bat "sh build.sh ${platformName} ${configName} build"
+                                                    bat "build.sh ${platformName} ${configName} build"
                                                     // Repeat the check for the output directory after attempting build.sh
                                                     if (fileExists('code_output')) {
                                                         archiveArtifacts artifacts: 'code_output/**', onlyIfSuccessful: true
