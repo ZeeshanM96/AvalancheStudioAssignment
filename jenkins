@@ -59,12 +59,12 @@ pipeline {
                             stage("Build Content - ${currentPlatform}") {
                                     dir('resources') {
                                         try {
-                                            bat "build.bat ${currentPlatform} build"
+                                            bat "build.sh ${currentPlatform} build"
                                             writeFile file: "../Artifacts/${currentPlatform}_content.flag", text: 'success'
                                         } catch (Exception e) {
-                                            echo "build.bat failed or not found for platform ${currentPlatform}, now trying build.sh."
+                                            echo "build.sh failed or not found for platform ${currentPlatform}, now trying build.sh."
                                             try {
-                                                bat "build.sh ${currentPlatform} build"
+                                                bat "build.bat ${currentPlatform} build"
                                                 writeFile file: "../Artifacts/${currentPlatform}_content.flag", text: 'success'
                                             } catch (Exception e2) {
                                                 currentBuild.result = 'FAILURE'
@@ -84,12 +84,12 @@ pipeline {
                                 stage("Build Code - ${platformName} - ${configName}") {
                                         dir('source') {
                                             try {
-                                                bat "build.bat ${platformName} ${configName} build"
+                                                bat "build.sh ${platformName} ${configName} build"
                                                 writeFile file: "../Artifacts/${platformName}_${configName}_code.flag", text: 'success'
                                             } catch (Exception e) {
-                                                echo "build.bat failed or not found for platform ${platform} & configuration ${configName}, now trying build.sh."
+                                                echo "build.sh failed or not found for platform ${platform} & configuration ${configName}, now trying build.sh."
                                                 try {
-                                                    bat "sh build.sh ${platformName} ${configName} build"
+                                                    bat "build.bat ${platformName} ${configName} build"
                                                     writeFile file: "../Artifacts/${platformName}_${configName}_code.flag", text: 'success'
                                                 } catch (Exception e2) {
                                                     currentBuild.result = 'FAILURE'
@@ -130,13 +130,13 @@ pipeline {
                                             dir('scripts') {
                                                 boolean packageAttempted = false
                                                 try {
-                                                    bat "build.bat ${platformName} ${configName} package"
+                                                    bat "build.sh ${platformName} ${configName} package"
                                                     writeFile file: "../Artifacts/${platformName}_${configName}_package.flag", text: 'success'
                                                     packageAttempted = true
                                                 } catch (Exception e) {
-                                                    echo "build.bat failed for platform ${platformName} & configuration ${configName}, now trying build.sh."
+                                                    echo "build.sh failed for platform ${platformName} & configuration ${configName}, now trying build.sh."
                                                     try {
-                                                        sh "build.sh ${platformName} ${configName} package"
+                                                        sh "build.bat ${platformName} ${configName} package"
                                                         writeFile file: "../Artifacts/${platformName}_${configName}_package.flag", text: 'success'
                                                         packageAttempted = true
                                                     } catch (Exception e2) {
@@ -151,11 +151,11 @@ pipeline {
                                                     boolean packageSuccess = fileExists "${WORKSPACE}\\Artifacts\\${platformName}_${configName}_package.flag"
                                                     if (packageSuccess) {
                                                         try {
-                                                            bat "build.bat ${platformName} ${configName} test"
+                                                            bat "build.sh ${platformName} ${configName} test"
                                                         } catch (Exception e) {
-                                                            echo "build.bat failed for platform ${platformName} & configuration ${configName}, now trying build.sh."
+                                                            echo "build.sh failed for platform ${platformName} & configuration ${configName}, now trying build.sh."
                                                             try {
-                                                                sh "build.sh ${platformName} ${configName} test"
+                                                                sh "build.bat ${platformName} ${configName} test"
                                                             } catch (Exception e2) {
                                                                 currentBuild.result = 'FAILURE'
                                                                 echo "Test failed for platform ${platformName}, configuration ${configName}: Both build.bat and build.sh could not be executed."
