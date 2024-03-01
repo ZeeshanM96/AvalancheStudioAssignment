@@ -97,12 +97,12 @@ pipeline {
                                             boolean codebuildSuccess = false
                                             try {
                                                 bat "build.bat ${platformName} ${configName} build"
-                                                boolean codebuildSuccess = true
+                                                codebuildSuccess = true
                                             } catch (Exception e) {
                                                 echo "build.bat failed or not found for platform ${platformName} & configuration ${configName}, now trying build.sh."
                                                 try {
                                                     bat "build.sh ${platformName} ${configName} build"
-                                                    boolean codebuildSuccess = true
+                                                    codebuildSuccess = true
                                                 } catch (Exception e2) {
                                                     currentBuild.result = 'FAILURE'
                                                     echo "Build Code failed for platform ${platformName}, configuration ${configName}: Both build.bat and build.sh could not be executed."
