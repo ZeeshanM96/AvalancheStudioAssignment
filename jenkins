@@ -60,12 +60,28 @@ pipeline {
                                     dir('resources') {
                                         try {
                                             bat "build.bat ${currentPlatform} build"
-                                            writeFile file: "../Artifacts/${currentPlatform}_content.flag", text: 'success'
+                                            // Assuming the output directory is named 'content_output', change as necessary
+                                            if (fileExists('content_output')) {
+                                                // If the content build is successful and output directory exists
+                                                archiveArtifacts artifacts: 'content_output/**', onlyIfSuccessful: true
+                                                writeFile file: "../Artifacts/${currentPlatform}_content.flag", text: 'success'
+                                            } else {
+                                                // If the directory does not exist, log an error
+                                                echo "Error: content_output directory does not exist for platform ${currentPlatform}"
+                                                error("Build Content failed: Missing content_output directory for ${currentPlatform}")
+                                            }
                                         } catch (Exception e) {
                                             echo "build.bat failed or not found for platform ${currentPlatform}, now trying build.sh."
                                             try {
                                                 bat "build.sh ${currentPlatform} build"
-                                                writeFile file: "../Artifacts/${currentPlatform}_content.flag", text: 'success'
+                                                // Repeat the check for the output directory after attempting build.sh
+                                                if (fileExists('content_output')) {
+                                                    archiveArtifacts artifacts: 'content_output/**', onlyIfSuccessful: true
+                                                    writeFile file: "../Artifacts/${currentPlatform}_content.flag", text: 'success'
+                                                } else {
+                                                    echo "Error: content_output directory does not exist for platform ${currentPlatform}"
+                                                    error("Build Content failed: Missing content_output directory for ${currentPlatform}")
+                                                }
                                             } catch (Exception e2) {
                                                 currentBuild.result = 'FAILURE'
                                                 echo "Build Content failed for platform ${currentPlatform}: Both build.bat and build.sh could not be executed."
@@ -85,12 +101,28 @@ pipeline {
                                         dir('source') {
                                             try {
                                                 bat "build.bat ${platformName} ${configName} build"
-                                                writeFile file: "../Artifacts/${platformName}_${configName}_code.flag", text: 'success'
+                                                // Assuming the output directory is named 'code_output', change as needed
+                                                if (fileExists('code_output')) {
+                                                    // If the code build is successful and output directory exists
+                                                    archiveArtifacts artifacts: 'code_output/**', onlyIfSuccessful: true
+                                                    writeFile file: "../Artifacts/${platformName}_${configName}_code.flag", text: 'success'
+                                                } else {
+                                                    // If the directory does not exist, log an error
+                                                    echo "Error: code_output directory does not exist for platform ${platformName} and configuration ${configName}"
+                                                    error("Build Code failed: Missing code_output directory for ${platformName} and configuration ${configName}")
+                                                }
                                             } catch (Exception e) {
-                                                echo "build.bat failed or not found for platform ${platform} & configuration ${configName}, now trying build.sh."
+                                                echo "build.bat failed or not found for platform ${platformName} & configuration ${configName}, now trying build.sh."
                                                 try {
                                                     bat "sh build.sh ${platformName} ${configName} build"
-                                                    writeFile file: "../Artifacts/${platformName}_${configName}_code.flag", text: 'success'
+                                                    // Repeat the check for the output directory after attempting build.sh
+                                                    if (fileExists('code_output')) {
+                                                        archiveArtifacts artifacts: 'code_output/**', onlyIfSuccessful: true
+                                                        writeFile file: "../Artifacts/${platformName}_${configName}_code.flag", text: 'success'
+                                                    } else {
+                                                        echo "Error: code_output directory does not exist for platform ${platformName} and configuration ${configName}"
+                                                        error("Build Code failed: Missing code_output directory for ${platformName} and configuration ${configName}")
+                                                    }
                                                 } catch (Exception e2) {
                                                     currentBuild.result = 'FAILURE'
                                                     echo "Build Code failed for platform ${platformName}, configuration ${configName}: Both build.bat and build.sh could not be executed."
