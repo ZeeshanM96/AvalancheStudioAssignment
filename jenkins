@@ -111,14 +111,14 @@ pipeline {
                                                 }
                                             }
                                             if (codebuildSuccess) {
-                                            if (!fileExists('content_output')) {
-                                                echo "content_output directory does not exist, creating..."
-                                                bat 'mkdir content_output'
+                                            if (!fileExists('code_output')) {
+                                                echo "code_output directory does not exist, creating..."
+                                                bat 'mkdir code_output'
                                             }
-                                            archiveArtifacts artifacts: 'content_output/**', onlyIfSuccessful: true
-                                            writeFile file: "../Artifacts/${currentPlatform}_content.flag", text: 'success'
+                                            archiveArtifacts artifacts: 'code_output/**', onlyIfSuccessful: true
+                                            writeFile file: "../Artifacts/${platformName}_${configName}code.flag", text: 'success'
                                         } else {
-                                            echo "Error: content build was not successful for platform ${currentPlatform}"
+                                            echo "Error: code build was not successful for platform ${platformName}"
                                         }
                                         }
                                 }
