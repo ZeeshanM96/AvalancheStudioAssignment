@@ -58,6 +58,10 @@ pipeline {
                         parallelStages["Content-${currentPlatform}"] = {
                             stage("Build Content - ${currentPlatform}") {
                                     dir('resources') {
+                                        if (!fileExists('content_output')) {
+                                            echo "content_output directory does not exist, creating..."
+                                            mkdir 'content_output'
+                                        }
                                         try {
                                             bat "build.bat ${currentPlatform} build"
                                             // Assuming the output directory is named 'content_output', change as necessary
@@ -99,6 +103,10 @@ pipeline {
                             parallelStages["Code-${platformName}-${configName}"] = {
                                 stage("Build Code - ${platformName} - ${configName}") {
                                         dir('source') {
+                                            if (!fileExists('code_output')) {
+                                            echo "code_output directory does not exist, creating..."
+                                            mkdir 'code_output'
+                                        }
                                             try {
                                                 bat "build.bat ${platformName} ${configName} build"
                                                 // Assuming the output directory is named 'code_output', change as needed
