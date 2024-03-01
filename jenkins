@@ -61,10 +61,12 @@ pipeline {
                                         if (!fileExists('content_output')) {
                                             echo "content_output directory does not exist, creating..."
                                             bat 'mkdir content_output'
+                                            bat "dir"
                                         }
                                         try {
                                             bat "build.bat ${currentPlatform} build"
                                             // Assuming the output directory is named 'content_output', change as necessary
+                                            bat "dir"
                                             if (fileExists('content_output')) {
                                                 // If the content build is successful and output directory exists
                                                 archiveArtifacts artifacts: 'content_output/**', onlyIfSuccessful: true
@@ -78,6 +80,7 @@ pipeline {
                                             echo "build.bat failed or not found for platform ${currentPlatform}, now trying build.sh."
                                             try {
                                                 bat "build.sh ${currentPlatform} build"
+                                                bat "dir"
                                                 // Repeat the check for the output directory after attempting build.sh
                                                 if (fileExists('content_output')) {
                                                     archiveArtifacts artifacts: 'content_output/**', onlyIfSuccessful: true
