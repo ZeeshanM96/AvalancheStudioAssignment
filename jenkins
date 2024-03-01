@@ -60,7 +60,7 @@ pipeline {
                                     dir('resources') {
                                         if (!fileExists('content_output')) {
                                             echo "content_output directory does not exist, creating..."
-                                            mkdir 'content_output'
+                                            dir('content_output')
                                         }
                                         try {
                                             bat "build.bat ${currentPlatform} build"
@@ -105,7 +105,7 @@ pipeline {
                                         dir('source') {
                                             if (!fileExists('code_output')) {
                                             echo "code_output directory does not exist, creating..."
-                                            mkdir 'code_output'
+                                            dir('code_output')
                                         }
                                             try {
                                                 bat "build.bat ${platformName} ${configName} build"
