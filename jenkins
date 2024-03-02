@@ -123,8 +123,8 @@ pipeline {
                                 stage("Package and Test - ${platformName} - ${configName}") {
                                     script {
                                         // Check if build artifacts exist
-                                        boolean codeBuildSuccess = fileExists "Artifacts\\${platformName}_${configName}_code.flag"
-                                        boolean contentBuildSuccess = fileExists "Artifacts\\${platformName}_content.flag"
+                                        boolean codeBuildSuccess = fileExists "Artifacts/${platformName}_${configName}_code.flag"
+                                        boolean contentBuildSuccess = fileExists "Artifacts/${platformName}_content.flag"
                                         if (codeBuildSuccess && contentBuildSuccess) {
                                             // Package
                                             dir('scripts') {
@@ -148,7 +148,7 @@ pipeline {
                                                 }
                                                 // Test only if package was attempted (either bat or sh succeeded)                                           
                                                 if (packageAttempted) {
-                                                    boolean packageSuccess = fileExists "${WORKSPACE}\\Artifacts\\${platformName}_${configName}_package.flag"
+                                                    boolean packageSuccess = fileExists "${WORKSPACE}/Artifacts/${platformName}_${configName}_package.flag"
                                                     if (packageSuccess) {
                                                         try {
                                                             bat "build.sh ${platformName} ${configName} test"
